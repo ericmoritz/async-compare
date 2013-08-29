@@ -11,7 +11,7 @@ import Control.Concurrent.Async
 import System.Environment
 import Data.List (sort)
 import Data.Time
-import Debug.Trace (trace)
+import Debug.Trace (trace, traceShow)
 
 data Comment = Comment {
   body :: String,
@@ -111,5 +111,10 @@ downloadBody = getResponseBody <=< simpleHTTP . getRequest
 downloadSubReddit = downloadBody . subredditURL
 downloadPost :: String -> IO String
 downloadPost = downloadBody . postURL
+
+traceArg msg x =
+  trace msg' x
+  where
+    msg' = msg ++ ": " ++ show x
 
 
