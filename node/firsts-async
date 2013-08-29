@@ -8,9 +8,10 @@ var maybe  = firsts.maybe;
 subreddits = process.argv.slice(2);
 
 var start = new Date();
-firsts.downloadAll(subreddits, function (){
+firsts.downloadAll(subreddits, function (firsts){
     var end = new Date();
     var elapsed = end - start
+    console.log(firsts);
     console.log(
 	"" + elapsed + "s"
     )

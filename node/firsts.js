@@ -2,37 +2,28 @@
    Downloaders
 **/
 var http = require("http");
-var async = require("async");
+//var async = require("async");
+var Q = require("q")
 
 function downloadAll(subreddits, finalCallback) {
-    async.concat(subreddits, 
-		 function(subreddit, callback) {
-		     downloadSubReddit(subreddit, function(permalinks) {
-			 permalinks.bind(function(links) {
-			     callback(null, links);
-			 });
-		     });
-		 },
-
-		 function(err, permalinks) {
-		     async.map(permalinks,
-				  function(permalink, callback) {
-				      downloadFirst(
-					  permalink, 
-					  function(first) {
-					      first.bind(function(comment) {
-						  callback(null, comment);
-					      });
-					  })
-				  },
-				  function(err, firsts) {
-				      finalCallback(firsts);
-				  })
-		 });
+    Q.all(subreddits.map(downloadSubReddit)).then(
+	function(links) {
+	    links = concatMap(function(mbl) { return mbl.getDefault([]) }, links);
+	    Q.all(links.map(downloadFirst))
+ 	     .done(function(comments) {
+		finalCallback(comments)
+	     });
+	}
+    )
 }
 exports.downloadAll = downloadAll;
 
-function downloadBody(url, callback) {
+function concatMap(f, arr) {
+    return Array.prototype.concat.apply([], arr.map(f))
+}
+
+function downloadBody(url) {
+    var deferred = Q.defer();
     http.get(url, function(res) {
 	var body = ""
 
@@ -41,27 +32,23 @@ function downloadBody(url, callback) {
 	});
 
 	res.on("end", function() {
-	    callback(body);
+	    deferred.resolve(body);
 	});
 
     });
+    return deferred.promise
 }
 exports.downloadBody = downloadBody;
 
-function downloadSubReddit(subreddit, callback) {
+function downloadSubReddit(subreddit) {
     var url = "http://www.reddit.com/r/" + subreddit + ".json";
-    downloadBody(url, function(body) {
-	callback(parseSubReddit(body));
-    });
+    return downloadBody(url).then(parseSubReddit);
 }
 exports.downloadSubReddit =  downloadSubReddit
 
-function downloadFirst(permalink, callback) {
+function downloadFirst(permalink) {
     var url = "http://www.reddit.com" + permalink + ".json";
-    downloadBody(url, function(body) {
-	var first = parseFirst(body);
-	callback(first);
-    });
+    return downloadBody(url).then(parseFirst);
 }
 exports.downloadFirst = downloadFirst;
 
@@ -134,6 +121,7 @@ function lift(monad, f) {
     }
 }
 exports.lift = lift;
+
 
 function maybe(x) {
    return {
