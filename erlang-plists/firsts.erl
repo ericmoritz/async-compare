@@ -10,18 +10,20 @@ main(Subreddits) ->
     io:format("~ws~n", [TS/1000000]).
 
 download_all(Subreddits) ->
-    Permalinks = lists:append(
-		   lists:append(
-		     plists:map(
-		       fun(S) -> parse_links(download_subreddit(S)) end,
-		       Subreddits))),
-    lists:sort(
-      fun(X,Y) -> lookup(<<"created">>, X) >= lookup(<<"created">>, Y) end, 
-      lists:append(
-	plists:map(
-	  fun(L) -> parse_first(download_post(L)) end,
-	  Permalinks))).
-    
+    Permalinks = plists:mapreduce(
+		   fun(S) -> [{1,L} || L <- parse_links(download_subreddit(S))] end,
+		   Subreddits,
+		   [],
+		   fun(Acc, 1, Items) -> Items ++ Acc end,
+		   1),
+    Comments = plists:mapreduce(
+		  fun(L) -> [{1, C} || C <- parse_first(download_post(L))] end,
+		  Permalinks,
+		  [],
+		  fun(Acc, 1, Items) -> [Items|Acc] end,
+		  1),
+    lists:sort(fun(X,Y) -> lookup(<<"created">>, X) >= lookup(<<"created">>, Y) end, 
+	       Comments).
 
 
 
