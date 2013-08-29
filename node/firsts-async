@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+// -*- javascript -*-
+
+var firsts = require("./firsts");
+var lift   = firsts.lift;
+var maybe  = firsts.maybe;
+
+subreddits = process.argv.slice(2);
+
+var start = new Date();
+firsts.downloadAll(subreddits, function (){
+    var end = new Date();
+    var elapsed = end - start
+    console.log(
+	"" + elapsed + "s"
+    )
+});
