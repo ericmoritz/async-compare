@@ -1,0 +1,2 @@
+build:
+	erlc firsts.erl

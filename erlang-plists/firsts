@@ -1,0 +1,8 @@
+#!/usr/bin/env escript
+%% -*- erlang -*-
+%%! -smp enable
+
+main(Subreddits) ->
+    application:start(inets),
+    firsts:main(Subreddits).
+
