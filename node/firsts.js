@@ -15,13 +15,13 @@ function downloadAll(subreddits, finalCallback) {
 		 },
 
 		 function(err, permalinks) {
-		     async.concat(permalinks,
+		     async.map(permalinks,
 				  function(permalink, callback) {
 				      downloadFirst(
 					  permalink, 
 					  function(first) {
 					      first.bind(function(comment) {
-						  callback(null, [comment]);
+						  callback(null, comment);
 					      });
 					  })
 				  },
