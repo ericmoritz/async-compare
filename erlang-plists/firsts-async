@@ -2,7 +2,11 @@
 %% -*- erlang -*-
 %%! -smp enable
 
-main(Subreddits) ->
+main([CountStr|Subreddits]) ->
     application:start(inets),
-    firsts:main(Subreddits).
+    Count = list_to_integer(CountStr),
+    lists:foreach(fun(_) ->
+			  firsts:main(Subreddits)
+		  end,
+		  lists:seq(1, Count)).
 

@@ -13,5 +13,6 @@ haskell:
 	@make -C haskell build
 
 run:
+	@mkdir -p data/
 	@./runall.sh $(EXAMPLES) | tee data/10times.txt
 
