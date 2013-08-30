@@ -6,6 +6,7 @@ var firsts = require("./firsts");
 var lift   = firsts.lift;
 var maybe  = firsts.maybe;
 
+Q.longStackSupport = true;
 
 var count = new Number(process.argv[2]);
 var subreddits = process.argv.slice(3);
@@ -25,7 +26,10 @@ function elpased(end) {
 for(var i = 0; i < count; i++) {
     p = p.then(function() { start = time("start"); })
  	 .then(function() { return firsts.downloadAll(subreddits) })
+//         .then(console.log)
 	 .then(function() { elpased(time("end")); });
 }
 
-	       
+p.catch(function(e) {
+    console.log(e.stack);
+})	       

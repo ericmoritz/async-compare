@@ -15,10 +15,13 @@ function downloadAll(subreddits, finalCallback) {
 	    }
 	)
     })).then(function(results) { 
-	return concatMap(function(x) { return x; }, results);
+	var comments = concatMap(catMaybes, results);
+	comments.sort(function(x,y) { return y.created - x.created });
+	return comments;
     });
 }
 exports.downloadAll = downloadAll;
+
 
 function concatMap(f, arr) {
     return Array.prototype.concat.apply([], arr.map(f))
@@ -115,7 +118,7 @@ function permalink(entity) {
 }
 
 /**
-   Utilities
+   Monads
 **/
 function lift(monad, f) {
     return function(m) {
@@ -140,6 +143,18 @@ function maybe(x) {
    }
 }
 exports.maybe = maybe;
+
+function catMaybes(maybes) {
+    return maybes.reduce(
+	function(arr, mb) {
+	    mb.bind(function(x) {
+		arr.push(x);
+	    });
+	    return arr;
+	},
+	[]);
+    
+}
 
 function lookup(key, obj) {
     return function(obj) {
