@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-COUNT=10
+COUNT=1
 
-for i in $@; do
-    pushd $i >/dev/null
-    echo -$i
-    ./firsts-async $COUNT news videos gifs funny
-    popd >/dev/null
+for i in $(seq 1 $COUNT); do
+    for name in $@; do
+	pushd $name >/dev/null
+	echo -n "$name	"
+	./firsts-async 1 news videos gifs funny
+	popd >/dev/null
+    done
 done
+
