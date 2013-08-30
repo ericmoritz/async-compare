@@ -1,0 +1,13 @@
+#!../.env/bin/python
+# -*- python -*-
+import sys
+sys.path.append("../")
+
+import firsts
+from multiprocessing import cpu_count, Pool
+import sys
+
+if __name__ == '__main__':
+
+    pool = Pool(cpu_count())
+    firsts.main(pool.map)

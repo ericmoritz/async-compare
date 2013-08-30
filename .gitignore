@@ -1,5 +1,7 @@
 haskell/firsts
 node_modules
 *.beam
+*.pyc
 *~
 data/
+python/.env/
