@@ -1,3 +1,5 @@
+**WARNING**: Repeatedly running this will DOS Reddit, Posting this to Hacker News will DDOS Reddit
+
 This is a comparison of implementations of the same task in the various platform.
 
 The goal is to demostrate the ability to express the task at hand. 

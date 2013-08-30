@@ -1,0 +1,14 @@
+#!../.env/bin/python
+# -*- python -*-
+import sys
+sys.path.append("../")
+
+from gevent.pool import Group
+import gevent.monkey; gevent.monkey.patch_all()
+import firsts
+from debug import trace
+
+
+if __name__ == '__main__':
+    group = Group()
+    firsts.main(map)

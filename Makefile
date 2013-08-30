@@ -1,7 +1,7 @@
-EXAMPLES=node erlang-plists haskell
+EXAMPLES=python/mp python/gevent python/threaded node erlang-plists haskell
 .PHONY: $(EXAMPLES)
 
-build: node erlang-plists haskell
+build: node erlang-plists haskell python
 
 node:
 	@make -C node build
@@ -11,6 +11,9 @@ erlang-plists:
 
 haskell:
 	@make -C haskell build
+
+python:
+	@make -C python build
 
 run:
 	@mkdir -p data/

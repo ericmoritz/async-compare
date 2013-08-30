@@ -1,8 +1,10 @@
-import urllib
+import urllib, urllib2
 import json
 from monads import Maybe, Just, Nothing, getNested
 from debug import trace, tc, reporttc
 from itertools import chain
+from functools import partial
+
 
 def maybeJSON(data):
     try:
@@ -10,16 +12,22 @@ def maybeJSON(data):
     except:
         return Nothing
 
+
+def escape(bit):
+    return urllib.quote(bit.encode("utf-8"))
+
+
 def downloadBody(url):
-    return urllib.urlopen(url).read()
+    return urllib2.urlopen(url).read()
 
 
 def downloadSubReddit(subreddit):
-    return downloadBody("http://reddit.com/r/" + subreddit + ".json")
+    return downloadBody("http://reddit.com/r/" + escape(subreddit) + ".json")
 
 
 def downloadPost(permalink):
-    return downloadBody("http://reddit.com" + permalink + ".json")
+    return downloadBody("http://reddit.com" + escape(permalink) + ".json")
+
 
 def parseSubReddit(subredditJSON):
     return maybeJSON(subredditJSON).ifJust(children).ifJust(permalinks)
@@ -80,14 +88,13 @@ def run(map_fun, *subreddits):
     permalinks = concat(
         map_fun(parseAndDownloadSubReddit, subreddits)
     )
-    print(Maybe.catMaybes(map_fun(parseAndDownloadFirst, permalinks)))
+    return Maybe.catMaybes(map_fun(parseAndDownloadFirst, permalinks))
 
 
 def main(map_fun):
     import sys
     count = int(sys.argv[1])
     subreddits = sys.argv[2:]
-
     for i in range(count):
         reporttc(tc(lambda: run(map_fun, *subreddits)))
 
