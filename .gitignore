@@ -2,3 +2,4 @@ haskell/firsts
 node_modules
 *.beam
 *~
+data/

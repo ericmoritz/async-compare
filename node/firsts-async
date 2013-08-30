@@ -1,17 +1,31 @@
 #!/usr/bin/env node
 // -*- javascript -*-
 
+var Q = require("q");
 var firsts = require("./firsts");
 var lift   = firsts.lift;
 var maybe  = firsts.maybe;
 
-subreddits = process.argv.slice(2);
 
-var start = new Date();
-firsts.downloadAll(subreddits, function (firsts){
-    var end = new Date();
-    var elapsed = (end - start) / 1000
-    console.log(
-	"" + elapsed + "s"
-    )
-});
+var count = new Number(process.argv[2]);
+var subreddits = process.argv.slice(3);
+
+
+var p = Q();
+var start = null;
+
+function time(label) {
+    return new Date();
+}
+function elpased(end) {
+    var e = (end - start) / 1000;
+    console.log(e + "s");    
+}
+
+for(var i = 0; i < count; i++) {
+    p = p.then(function() { start = time("start"); })
+ 	 .then(function() { return firsts.downloadAll(subreddits) })
+	 .then(function() { elpased(time("end")); });
+}
+
+	       

@@ -88,11 +88,15 @@ tc f = do
   end <- getCurrentTime
   return (diffUTCTime end start, ret)
 
-main = print . fst <=< tc $ do
-  subreddits <- getArgs
-  mode <- getMode `liftM` getProgName 
-  permalinks <- downloadAll mode subreddits
+run :: Mode -> [String] -> IO ()
+run mode subreddits = print . fst <=< tc $ do
+  downloadAll mode subreddits
   return ()
+
+main = do
+  (nStr:subreddits) <- getArgs
+  mode <- getMode `liftM` getProgName 
+  sequence $ replicate (read nStr) $ run mode subreddits
   where
     getMode "firsts-async" = Async
     getMode "firsts-sync"  = Sync

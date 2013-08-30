@@ -6,15 +6,17 @@ var http = require("http");
 var Q = require("q")
 
 function downloadAll(subreddits, finalCallback) {
-    Q.all(subreddits.map(downloadSubReddit)).then(
-	function(links) {
-	    links = concatMap(function(mbl) { return mbl.getDefault([]) }, links);
-	    Q.all(links.map(downloadFirst))
- 	     .done(function(comments) {
-		finalCallback(comments)
-	     });
-	}
-    )
+    return Q.all(subreddits.map(function(subreddit) {
+	return downloadSubReddit(subreddit).then(
+	    function(mbLinks) {
+		return Q.all(
+		    mbLinks.getDefault([]).map(downloadFirst)
+		);
+	    }
+	)
+    })).then(function(results) { 
+	return concatMap(function(x) { return x; }, results);
+    });
 }
 exports.downloadAll = downloadAll;
 
